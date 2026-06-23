@@ -1,0 +1,106 @@
+<?php
+
+return [
+    'tagline' => 'Quality productions and opportunities for journalists',
+    'meta_description' => 'Collectinfos – Quality productions and opportunities for journalists',
+
+    'nav' => [
+        'home' => 'HOME',
+        'contents' => 'OUR CONTENT',
+        'products' => 'OUR PRODUCTS',
+        'press' => 'PRESS RELATIONS',
+        'fact_checking' => 'FACT-CHECKING',
+        'contact' => 'CONTACT',
+        'collaboration' => 'Collaboration',
+        'themes' => 'Topics',
+        'search' => 'Search',
+        'search_placeholder' => 'What are you looking for…',
+        'contact_us' => 'Contact us',
+        'cart' => 'Cart',
+        'account' => 'My account',
+        'menu' => 'Menu',
+        'language' => 'Language',
+    ],
+
+    'hero' => [
+        'title' => 'COLLECTINFOS',
+        'slogan_line1' => 'Information is our commitment.',
+        'slogan_line2' => 'Journalists are our strength.',
+        'buy' => 'Buy',
+        'propose' => 'Propose',
+        'order' => 'Order',
+    ],
+
+    'sections' => [
+        'categories' => 'OUR NEWS SECTIONS',
+        'reportages' => 'OUR LATEST REPORTS',
+        'stats' => 'COLLECTINFOS IN NUMBERS',
+        'partners' => 'OUR MEDIA PARTNERS',
+        'newsletter' => 'SUBSCRIBE TO OUR NEWSLETTER',
+        'newsletter_desc' => 'Receive our weekly reports, videos and opportunities for journalists directly in your inbox.',
+        'app' => 'DOWNLOAD OUR APP',
+    ],
+
+    'badges' => [
+        'free' => 'Free',
+        'paid' => 'Paid',
+        'subscribers' => 'Subscribers',
+        'preview' => 'Preview',
+        'cart' => 'Cart',
+        'read' => 'Read',
+        'free_access' => 'Free access',
+    ],
+
+    'common' => [
+        'copyright' => 'Copyright',
+        'back' => 'Back',
+        'save' => 'Save',
+        'cancel' => 'Cancel',
+        'see_all' => 'See all',
+        'contact_us_btn' => 'Contact us',
+    ],
+
+    'cart' => [
+        'title' => 'My cart',
+        'subtitle' => 'Your selection of content to purchase.',
+        'empty_title' => 'Your cart is empty',
+        'empty_text' => 'Browse our content and add reports to your cart.',
+        'browse' => 'Browse content',
+        'summary' => 'Summary',
+        'checkout' => 'Confirm purchase',
+        'login_to_buy' => 'Sign in to purchase',
+        'continue' => 'Continue shopping',
+        'payment_note' => 'Simulated payment — no real charge will be made.',
+    ],
+
+    'account' => [
+        'title' => 'My account',
+        'subtitle' => 'Sign in to access your purchases and subscribed content.',
+        'login' => 'Sign in',
+        'register' => 'Create an account',
+        'logout' => 'Sign out',
+        'my_purchases' => 'My purchases',
+        'welcome' => 'Hello, :name',
+        'dashboard_subtitle' => 'Manage your purchases and access your content.',
+    ],
+
+    'contents' => [
+        'title' => 'Our content',
+        'subtitle' => 'Videos, articles, podcasts, photos and infographics on pan-African news',
+        'filter' => 'Filter',
+        'search' => 'Search',
+        'all_types' => 'All types',
+        'all_categories' => 'All categories',
+        'all_themes' => 'All themes',
+        'all_access' => 'All access',
+        'free' => 'Free',
+        'subscribers' => 'Subscribers',
+        'results' => ':count item(s) found',
+        'similar' => 'SIMILAR CONTENT',
+        'premium' => 'Premium content',
+        'buy' => 'Buy',
+        'preview' => 'Watch preview',
+        'purchased' => 'Content purchased',
+        'add_cart' => 'Add to cart',
+    ],
+];

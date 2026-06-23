@@ -1,0 +1,106 @@
+<?php
+
+return [
+    'tagline' => 'Produções de qualidade e oportunidades para jornalistas',
+    'meta_description' => 'Collectinfos – Produções de qualidade e oportunidades para jornalistas',
+
+    'nav' => [
+        'home' => 'INÍCIO',
+        'contents' => 'NOSSOS CONTEÚDOS',
+        'products' => 'NOSSOS PRODUTOS',
+        'press' => 'RELAÇÕES COM A IMPRENSA',
+        'fact_checking' => 'FACT-CHECKING',
+        'contact' => 'CONTATO',
+        'collaboration' => 'Colaboração',
+        'themes' => 'Temática',
+        'search' => 'Pesquisar',
+        'search_placeholder' => 'O que você procura…',
+        'contact_us' => 'Fale conosco',
+        'cart' => 'Carrinho',
+        'account' => 'Minha conta',
+        'menu' => 'Menu',
+        'language' => 'Idioma',
+    ],
+
+    'hero' => [
+        'title' => 'COLLECTINFOS',
+        'slogan_line1' => 'A informação, nosso compromisso.',
+        'slogan_line2' => 'Os jornalistas, nossa força.',
+        'buy' => 'Comprar',
+        'propose' => 'Propor',
+        'order' => 'Encomendar',
+    ],
+
+    'sections' => [
+        'categories' => 'NOSSAS SEÇÕES DE INFORMAÇÃO',
+        'reportages' => 'NOSSAS ÚLTIMAS REPORTAGENS',
+        'stats' => 'COLLECTINFOS EM NÚMEROS',
+        'partners' => 'NOSSOS PARCEIROS DE MÍDIA',
+        'newsletter' => 'ASSINE NOSSA NEWSLETTER',
+        'newsletter_desc' => 'Receba semanalmente nossas reportagens, vídeos e oportunidades para jornalistas diretamente no seu e-mail.',
+        'app' => 'BAIXE NOSSO APLICATIVO',
+    ],
+
+    'badges' => [
+        'free' => 'Grátis',
+        'paid' => 'Pago',
+        'subscribers' => 'Assinantes',
+        'preview' => 'Prévia',
+        'cart' => 'Carrinho',
+        'read' => 'Ler',
+        'free_access' => 'Acesso livre',
+    ],
+
+    'common' => [
+        'copyright' => 'Copyright',
+        'back' => 'Voltar',
+        'save' => 'Salvar',
+        'cancel' => 'Cancelar',
+        'see_all' => 'Ver tudo',
+        'contact_us_btn' => 'Fale conosco',
+    ],
+
+    'cart' => [
+        'title' => 'Meu carrinho',
+        'subtitle' => 'Sua seleção de conteúdos para adquirir.',
+        'empty_title' => 'Seu carrinho está vazio',
+        'empty_text' => 'Navegue pelos nossos conteúdos e adicione reportagens ao carrinho.',
+        'browse' => 'Ver nossos conteúdos',
+        'summary' => 'Resumo',
+        'checkout' => 'Confirmar compra',
+        'login_to_buy' => 'Entrar para comprar',
+        'continue' => 'Continuar comprando',
+        'payment_note' => 'Pagamento simulado — nenhuma cobrança real será feita.',
+    ],
+
+    'account' => [
+        'title' => 'Minha conta',
+        'subtitle' => 'Entre para acessar suas compras e conteúdos assinados.',
+        'login' => 'Entrar',
+        'register' => 'Criar conta',
+        'logout' => 'Sair',
+        'my_purchases' => 'Minhas compras',
+        'welcome' => 'Olá, :name',
+        'dashboard_subtitle' => 'Gerencie suas compras e acesse seus conteúdos.',
+    ],
+
+    'contents' => [
+        'title' => 'Nossos conteúdos',
+        'subtitle' => 'Vídeos, artigos, podcasts, fotos e infográficos sobre a actualidade pan-africana',
+        'filter' => 'Filtrar',
+        'search' => 'Pesquisa',
+        'all_types' => 'Todos os tipos',
+        'all_categories' => 'Todas as categorias',
+        'all_themes' => 'Todos os temas',
+        'all_access' => 'Todos os acessos',
+        'free' => 'Grátis',
+        'subscribers' => 'Assinantes',
+        'results' => ':count conteúdo(s) encontrado(s)',
+        'similar' => 'CONTEÚDOS SIMILARES',
+        'premium' => 'Conteúdo premium',
+        'buy' => 'Comprar',
+        'preview' => 'Ver prévia',
+        'purchased' => 'Conteúdo adquirido',
+        'add_cart' => 'Adicionar ao carrinho',
+    ],
+];
