@@ -4,11 +4,11 @@
 @section('page-title', 'Coordonnées & contact')
 
 @section('content')
-    <form class="admin-form" method="POST" action="{{ route('admin.settings.contact.update') }}" style="max-width: 560px;">
+    <form class="admin-form admin-form--card" method="POST" action="{{ route('admin.settings.contact.update') }}" style="max-width: 560px;">
         @csrf
         @method('PUT')
 
-        <p class="form-hint" style="margin-bottom: 20px;">Ces informations s'affichent dans l'en-tête du site, sur la page Contact et Relations presse.</p>
+        <p class="form-hint" style="margin-bottom: 1.25rem;">Ces informations s'affichent dans l'en-tête du site, sur la page Contact et Relations presse.</p>
 
         <div class="form-group">
             <label for="phone">Téléphone *</label>
@@ -25,8 +25,8 @@
             <textarea id="zone" name="zone" rows="3">{{ old('zone', $contact['zone']) }}</textarea>
         </div>
 
-        <div class="form-actions" style="border: none; padding-top: 0; justify-content: flex-start;">
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <div class="form-actions" style="border: none; padding-top: 0; margin-top: 0; justify-content: flex-start;">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Enregistrer</button>
         </div>
     </form>
 @endsection

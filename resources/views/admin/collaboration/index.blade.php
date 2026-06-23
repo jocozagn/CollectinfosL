@@ -4,8 +4,8 @@
 @section('page-title', 'Candidatures collaboration')
 
 @section('content')
-    <div class="admin-panel">
-        <div class="panel-header">
+    <div class="admin-panel admin-panel--data">
+        <div class="panel-header panel-header--toolbar">
             <form class="filter-form" method="GET">
                 <select name="type">
                     <option value="">Tous les types</option>
@@ -18,13 +18,14 @@
                     <option value="accepted" @selected(request('status') === 'accepted')>Acceptée</option>
                     <option value="rejected" @selected(request('status') === 'rejected')>Refusée</option>
                 </select>
-                <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrer</button>
+                <button type="submit" class="btn btn-secondary btn-sm"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrer</button>
             </form>
         </div>
 
         @if ($requests->isEmpty())
             <p class="empty-state">Aucune candidature trouvée.</p>
         @else
+            <div class="table-wrap">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -57,11 +58,12 @@
                                     @endswitch
                                 </span>
                             </td>
-                            <td><a href="{{ route('admin.collaboration.show', $item) }}" class="btn btn-sm"><i class="fa-solid fa-eye" aria-hidden="true"></i> Voir</a></td>
+                            <td><a href="{{ route('admin.collaboration.show', $item) }}" class="btn btn-sm btn-outline"><i class="fa-solid fa-eye" aria-hidden="true"></i> Voir</a></td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            </div>
 
             <div class="pagination-wrap">{{ $requests->links() }}</div>
         @endif

@@ -20,6 +20,8 @@ class PageController extends Controller
         return view('pages.press', [
             'press' => SiteSetting::press(),
             'contact' => SiteSetting::contact(),
+            'pressTopics' => config('collectinfos.press.topics', []),
+            'pressCountries' => config('collectinfos.press.countries', []),
         ]);
     }
 

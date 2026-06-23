@@ -33,8 +33,20 @@
                     <div class="form-group">
                         <label for="status">Statut *</label>
                         <select id="status" name="status" required>
+                            <option value="pending" @selected(old('status', $investigation->status) === 'pending')>En validation</option>
                             <option value="open" @selected(old('status', $investigation->status) === 'open')>Ouverte</option>
                             <option value="closed" @selected(old('status', $investigation->status) === 'closed')>Fermée</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">Journaliste porteur</label>
+                        <select id="user_id" name="user_id">
+                            <option value="">— Aucun —</option>
+                            @foreach ($journalists as $journalist)
+                                <option value="{{ $journalist->id }}" @selected(old('user_id', $investigation->user_id) == $journalist->id)>
+                                    {{ $journalist->name }} ({{ $journalist->email }})
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group">

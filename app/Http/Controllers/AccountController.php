@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContentPurchase;
-use App\Models\User;
+use App\Models\Investigation;
+use App\Models\InvestigationParticipant;
+use App\Models\CollaborationRequest;
+use App\Models\Content;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,21 +15,69 @@ use Illuminate\View\View;
 
 class AccountController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         if (! Auth::check()) {
             return view('pages.account');
         }
 
+        $user = Auth::user();
+        $tab = $request->query('tab', $user->isJournalist() ? 'investigations' : 'purchases');
+
+        if (! $user->isJournalist() && in_array($tab, ['investigations', 'applications', 'participations'], true)) {
+            $tab = 'purchases';
+        }
+
         $purchases = ContentPurchase::query()
             ->with('content')
-            ->where('user_id', Auth::id())
+            ->where('user_id', $user->id)
             ->latest('purchased_at')
             ->get();
 
+        $ownedInvestigations = collect();
+        $applications = collect();
+        $participations = collect();
+        $themes = [];
+
+        if ($user->isJournalist()) {
+            $ownedInvestigations = Investigation::query()
+                ->where('user_id', $user->id)
+                ->latest()
+                ->get();
+
+            $applications = CollaborationRequest::query()
+                ->with('investigation')
+                ->where(function ($query) use ($user) {
+                    $query->where('user_id', $user->id)
+                        ->orWhere('email', $user->email);
+                })
+                ->latest()
+                ->get();
+
+            $participationIds = InvestigationParticipant::query()
+                ->where('user_id', $user->id)
+                ->pluck('investigation_id');
+
+            $participations = Investigation::query()
+                ->with('owner')
+                ->whereIn('id', $participationIds)
+                ->where(function ($query) use ($user) {
+                    $query->whereNull('user_id')->orWhere('user_id', '!=', $user->id);
+                })
+                ->latest('updated_at')
+                ->get();
+
+            $themes = Content::themeLabels();
+        }
+
         return view('pages.account-dashboard', [
-            'user' => Auth::user(),
+            'user' => $user,
+            'tab' => $tab,
             'purchases' => $purchases,
+            'ownedInvestigations' => $ownedInvestigations,
+            'applications' => $applications,
+            'participations' => $participations,
+            'themes' => $themes,
         ]);
     }
 
@@ -62,19 +113,24 @@ class AccountController extends Controller
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'journalist' => ['nullable', 'boolean'],
         ]);
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'user',
+            'role' => $request->boolean('journalist') ? 'journalist' : 'user',
         ]);
 
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('account')->with('account_success', 'Bienvenue ! Votre compte a été créé.');
+        $message = $user->isJournalist()
+            ? 'Bienvenue ! Votre compte journaliste a été créé. Vous pouvez proposer ou rejoindre des enquêtes.'
+            : 'Bienvenue ! Votre compte a été créé.';
+
+        return redirect()->route('account')->with('account_success', $message);
     }
 
     public function logout(Request $request): RedirectResponse

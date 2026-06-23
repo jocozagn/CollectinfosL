@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CollaborationRequest;
+use App\Services\CollaborationAcceptanceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CollaborationRequestController extends Controller
 {
+    public function __construct(
+        private CollaborationAcceptanceService $acceptanceService
+    ) {}
+
     public function index(Request $request): View
     {
-        $query = CollaborationRequest::query()->with('investigation')->latest();
+        $query = CollaborationRequest::query()->with(['investigation', 'user'])->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -29,7 +34,7 @@ class CollaborationRequestController extends Controller
 
     public function show(CollaborationRequest $collaboration): View
     {
-        $collaboration->load('investigation');
+        $collaboration->load(['investigation', 'user']);
 
         return view('admin.collaboration.show', [
             'request' => $collaboration,
@@ -42,7 +47,10 @@ class CollaborationRequestController extends Controller
             'status' => ['required', 'in:pending,accepted,rejected'],
         ]);
 
+        $previousStatus = $collaboration->status;
         $collaboration->update($data);
+
+        $this->acceptanceService->handleStatusChange($collaboration->fresh(), $previousStatus, $data['status']);
 
         return redirect()->route('admin.collaboration.show', $collaboration)
             ->with('success', 'Statut mis à jour.');

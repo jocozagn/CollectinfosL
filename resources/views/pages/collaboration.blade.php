@@ -72,6 +72,13 @@
                     </div>
                 @endif
 
+                @if ($authUser && $authUser->isJournalist())
+                    <p class="form-intro">
+                        Connecté en tant que <strong>{{ $authUser->name }}</strong>.
+                        <a href="{{ route('account', ['tab' => 'applications']) }}">Voir mes candidatures</a>
+                    </p>
+                @endif
+
                 <form class="ci-form" method="POST" action="{{ route('collaboration.store') }}" id="collaboration-form-el">
                     @csrf
                     <div class="form-group">
@@ -86,6 +93,14 @@
                                 <span><i class="fa-solid fa-handshake" aria-hidden="true"></i> Rejoindre une enquête</span>
                             </label>
                         </div>
+                    </div>
+
+                    <div class="form-group" id="proposed-title-wrap">
+                        <label for="proposed_title">Titre de l'enquête proposée *</label>
+                        <input type="text" id="proposed_title" name="proposed_title" value="{{ old('proposed_title') }}" placeholder="Intitulé de votre enquête">
+                        @error('proposed_title')
+                            <span class="field-error">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <div class="form-group" id="investigation-select-wrap">
@@ -104,11 +119,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="collab-name">Nom *</label>
-                            <input type="text" id="collab-name" name="name" value="{{ old('name') }}" required>
+                            <input type="text" id="collab-name" name="name" value="{{ old('name', $authUser->name ?? '') }}" required>
                         </div>
                         <div class="form-group">
                             <label for="collab-email">E-mail *</label>
-                            <input type="email" id="collab-email" name="email" value="{{ old('email') }}" required>
+                            <input type="email" id="collab-email" name="email" value="{{ old('email', $authUser->email ?? '') }}" required>
                         </div>
                     </div>
                     <div class="form-row">
@@ -139,12 +154,19 @@
 document.addEventListener('DOMContentLoaded', function () {
     const typeRadios = document.querySelectorAll('input[name="type"]');
     const selectWrap = document.getElementById('investigation-select-wrap');
+    const proposedWrap = document.getElementById('proposed-title-wrap');
     const select = document.getElementById('investigation_id');
+    const proposedTitle = document.getElementById('proposed_title');
 
     function toggleInvestigation() {
-        const isJoin = document.querySelector('input[name="type"]:checked')?.value === 'join';
+        const type = document.querySelector('input[name="type"]:checked')?.value;
+        const isJoin = type === 'join';
+        const isPropose = type === 'propose';
         selectWrap.style.display = isJoin ? 'block' : 'none';
+        if (proposedWrap) proposedWrap.style.display = isPropose ? 'block' : 'none';
         if (!isJoin) select.value = '';
+        if (proposedTitle && !isPropose) proposedTitle.removeAttribute('required');
+        if (proposedTitle && isPropose) proposedTitle.setAttribute('required', 'required');
     }
 
     typeRadios.forEach(function (r) { r.addEventListener('change', toggleInvestigation); });

@@ -37,6 +37,39 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isJournalist(): bool
+    {
+        return $this->role === 'journalist';
+    }
+
+    public function isJournalistOrAdmin(): bool
+    {
+        return in_array($this->role, ['journalist', 'admin'], true);
+    }
+
+    public function ownedInvestigations(): HasMany
+    {
+        return $this->hasMany(Investigation::class, 'user_id');
+    }
+
+    public function collaborationRequests(): HasMany
+    {
+        return $this->hasMany(CollaborationRequest::class);
+    }
+
+    public function investigationParticipations(): HasMany
+    {
+        return $this->hasMany(InvestigationParticipant::class);
+    }
+
+    public function participatingInvestigations(): BelongsToMany
+    {
+        return $this->belongsToMany(Investigation::class, 'investigation_participants')
+            ->withPivot(['collaboration_request_id', 'joined_at'])
+            ->withTimestamps()
+            ->orderByDesc('investigation_participants.joined_at');
+    }
+
     public function purchases(): HasMany
     {
         return $this->hasMany(ContentPurchase::class);

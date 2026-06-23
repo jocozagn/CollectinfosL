@@ -72,6 +72,10 @@
                                 <span class="form-error">{{ $message }}</span>
                             @enderror
                         </div>
+                        <label class="checkbox-label checkbox-label--inline">
+                            <input type="checkbox" name="journalist" value="1" @checked(old('journalist'))>
+                            Je suis journaliste (compte collaboration & enquêtes)
+                        </label>
                         <button type="submit" class="ci-btn ci-btn--primary">
                             <i class="fa-solid fa-user-plus" aria-hidden="true"></i> S'inscrire
                         </button>

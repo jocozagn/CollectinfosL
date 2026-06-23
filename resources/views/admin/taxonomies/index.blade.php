@@ -4,17 +4,20 @@
 @section('page-title', $kindLabel)
 
 @section('content')
-    <div class="admin-panel">
+    <div class="admin-panel admin-panel--data">
         <div class="panel-header">
             <h2>{{ $items->total() }} élément(s)</h2>
-            <a href="{{ route('admin.taxonomies.create', $kindRoute) }}" class="btn btn-primary">
-                <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter
-            </a>
+            <div class="panel-header-actions">
+                <a href="{{ route('admin.taxonomies.create', $kindRoute) }}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter
+                </a>
+            </div>
         </div>
 
         @if ($items->isEmpty())
             <p class="empty-state">Aucun élément. <a href="{{ route('admin.taxonomies.create', $kindRoute) }}">Créer le premier</a>.</p>
         @else
+            <div class="table-wrap">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -67,17 +70,18 @@
                                 <td>{{ $item->show_on_home ? 'Oui' : 'Non' }}</td>
                             @endif
                             <td class="actions">
-                                <a href="{{ route('admin.taxonomies.edit', [$kindRoute, $item]) }}" class="btn btn-sm"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
+                                <a href="{{ route('admin.taxonomies.edit', [$kindRoute, $item]) }}" class="btn btn-sm btn-outline btn-icon" title="Modifier"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
                                 <form action="{{ route('admin.taxonomies.destroy', [$kindRoute, $item]) }}" method="POST" onsubmit="return confirm('Supprimer cet élément ?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+                                    <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Supprimer"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
                                 </form>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            </div>
 
             <div class="pagination-wrap">{{ $items->links() }}</div>
         @endif

@@ -10,6 +10,7 @@ Inspirée de [collectinfos.org](https://collectinfos.org/).
 - Accueil, catalogue de contenus, fiches détaillées
 - Multilingue (FR / EN / PT)
 - Authentification visiteurs, panier et achats simulés
+- Comptes journalistes : enquêtes émises, candidatures, participations
 - Pages institutionnelles : contact, collaboration, produits, presse, fact-checking
 - Newsletter
 
@@ -62,7 +63,13 @@ Admin : `http://localhost:8000/admin`
 | Rôle | E-mail | Mot de passe |
 |------|--------|--------------|
 | Visiteur | `demo@collectinfos.org` | `demo123` |
+| Journaliste | `journalist@collectinfos.org` | `demo123` |
 | Admin | `admin@collectinfos.org` | `admin123` |
+
+Le compte journaliste affiche dans **Mon compte** (`/mon-compte`) :
+- **Mes enquêtes** — enquêtes proposées par le journaliste (statut en validation, ouverte, fermée)
+- **Mes candidatures** — demandes pour rejoindre ou proposer une enquête
+- **Enquêtes rejointes** — participations aux enquêtes d'autres porteurs
 
 ## Stack technique
 

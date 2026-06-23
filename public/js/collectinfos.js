@@ -206,4 +206,34 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.key === 'Escape') stopPreview();
         });
     }
+
+    // Curseur expérience entreprise (Relations presse)
+    document.querySelectorAll('[data-range-output]').forEach(function (input) {
+        const outputId = input.getAttribute('data-range-output');
+        const output = outputId ? document.getElementById(outputId) : null;
+
+        function updateRangeLabel() {
+            if (!output) return;
+            const value = parseInt(input.value, 10) || 0;
+            output.textContent = value >= 10 ? '10 ans et plus' : String(value);
+        }
+
+        input.addEventListener('input', updateRangeLabel);
+        updateRangeLabel();
+    });
+
+    // Thématique « Autre » (Relations presse)
+    document.querySelectorAll('[data-toggle-other]').forEach(function (checkbox) {
+        const targetId = checkbox.getAttribute('data-toggle-other');
+        const target = targetId ? document.getElementById(targetId) : null;
+
+        if (!target) return;
+
+        function syncOtherField() {
+            target.hidden = !checkbox.checked;
+        }
+
+        checkbox.addEventListener('change', syncOtherField);
+        syncOtherField();
+    });
 });

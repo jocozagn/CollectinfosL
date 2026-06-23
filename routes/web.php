@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InvestigationController as AdminInvestigationController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController as AdminNewsletterController;
 use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\PressRequestController as AdminPressRequestController;
 use App\Http\Controllers\Admin\SiteProductController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\SiteStatController;
@@ -18,8 +19,10 @@ use App\Http\Controllers\CollaborationController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JournalistInvestigationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PressController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
@@ -38,6 +41,7 @@ Route::post('/collaboration', [CollaborationController::class, 'store'])->name('
 
 Route::get('/nos-produits', [PageController::class, 'products'])->name('products');
 Route::get('/relations-presse', [PageController::class, 'press'])->name('press');
+Route::post('/relations-presse', [PressController::class, 'store'])->name('press.store');
 Route::get('/fact-checking', [PageController::class, 'factChecking'])->name('fact-checking');
 Route::get('/panier', [CartController::class, 'index'])->name('cart');
 Route::post('/panier/ajouter/{content:slug}', [CartController::class, 'add'])->name('cart.add');
@@ -48,6 +52,7 @@ Route::get('/mon-compte', [AccountController::class, 'index'])->name('account');
 Route::post('/mon-compte/connexion', [AccountController::class, 'login'])->middleware('guest')->name('account.login');
 Route::post('/mon-compte/inscription', [AccountController::class, 'register'])->middleware('guest')->name('account.register');
 Route::post('/mon-compte/deconnexion', [AccountController::class, 'logout'])->middleware('auth')->name('account.logout');
+Route::post('/mon-compte/enquetes', [JournalistInvestigationController::class, 'store'])->middleware('auth')->name('account.investigations.store');
 
 // Administration
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -62,6 +67,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('messages', [AdminContactMessageController::class, 'index'])->name('messages.index');
         Route::get('messages/{message}', [AdminContactMessageController::class, 'show'])->name('messages.show');
         Route::delete('messages/{message}', [AdminContactMessageController::class, 'destroy'])->name('messages.destroy');
+
+        Route::get('press-requests', [AdminPressRequestController::class, 'index'])->name('press-requests.index');
+        Route::get('press-requests/{pressRequest}', [AdminPressRequestController::class, 'show'])->name('press-requests.show');
+        Route::delete('press-requests/{pressRequest}', [AdminPressRequestController::class, 'destroy'])->name('press-requests.destroy');
 
         Route::get('collaboration', [AdminCollaborationController::class, 'index'])->name('collaboration.index');
         Route::get('collaboration/{collaboration}', [AdminCollaborationController::class, 'show'])->name('collaboration.show');

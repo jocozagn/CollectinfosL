@@ -58,6 +58,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call(InvestigationSeeder::class);
+        $this->call(JournalistDemoSeeder::class);
         $this->call(TaxonomySeeder::class);
         $this->call(SiteStatSeeder::class);
         $this->call(PartnerSeeder::class);

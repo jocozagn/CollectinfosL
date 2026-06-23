@@ -16,8 +16,20 @@
         <div class="detail-grid">
             <div class="detail-item">
                 <label>Type</label>
-                <p>{{ $request->type === 'join' ? 'Rejoindre une enquête' : 'Proposer une enquête' }}</p>
+                <p>{{ $request->typeLabel() }}</p>
             </div>
+            @if ($request->proposed_title)
+            <div class="detail-item">
+                <label>Titre proposé</label>
+                <p>{{ $request->proposed_title }}</p>
+            </div>
+            @endif
+            @if ($request->user)
+            <div class="detail-item">
+                <label>Compte journaliste</label>
+                <p>{{ $request->user->name }} ({{ $request->user->email }})</p>
+            </div>
+            @endif
             <div class="detail-item">
                 <label>Email</label>
                 <p><a href="mailto:{{ $request->email }}">{{ $request->email }}</a></p>

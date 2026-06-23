@@ -4,10 +4,10 @@
 @section('page-title', 'Gestion des contenus')
 
 @section('content')
-    <div class="admin-panel">
-        <div class="panel-header">
+    <div class="admin-panel admin-panel--data">
+        <div class="panel-header panel-header--toolbar">
             <form class="filter-form" method="GET">
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Rechercher...">
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Rechercher…">
                 <select name="type">
                     <option value="">Tous les types</option>
                     @foreach ($types as $key => $label)
@@ -19,14 +19,17 @@
                     <option value="published" @selected(request('status') === 'published')>Publié</option>
                     <option value="draft" @selected(request('status') === 'draft')>Brouillon</option>
                 </select>
-                <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrer</button>
+                <button type="submit" class="btn btn-secondary btn-sm"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrer</button>
             </form>
-            <a href="{{ route('admin.contents.create') }}" class="btn btn-primary"><i class="fa-solid fa-plus" aria-hidden="true"></i> Nouveau contenu</a>
+            <div class="panel-header-actions">
+                <a href="{{ route('admin.contents.create') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus" aria-hidden="true"></i> Nouveau contenu</a>
+            </div>
         </div>
 
         @if ($contents->isEmpty())
             <p class="empty-state">Aucun contenu trouvé.</p>
         @else
+            <div class="table-wrap">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -61,17 +64,18 @@
                                 </span>
                             </td>
                             <td class="actions">
-                                <a href="{{ route('admin.contents.edit', $item) }}" class="btn btn-sm"><i class="fa-solid fa-pen" aria-hidden="true"></i> Modifier</a>
+                                <a href="{{ route('admin.contents.edit', $item) }}" class="btn btn-sm btn-outline btn-icon" title="Modifier"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
                                 <form action="{{ route('admin.contents.destroy', $item) }}" method="POST" onsubmit="return confirm('Supprimer ce contenu ?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash" aria-hidden="true"></i> Supprimer</button>
+                                    <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Supprimer"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
                                 </form>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            </div>
 
             <div class="pagination-wrap">{{ $contents->links() }}</div>
         @endif

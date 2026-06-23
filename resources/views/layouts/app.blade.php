@@ -11,7 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@700;800&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/collectinfos.css') }}">
-    <link rel="icon" href="https://collectinfos.org/wp-content/uploads/2023/11/cropped-ii-3-1-32x32.jpg" sizes="32x32">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png" sizes="32x32">
+    <link rel="icon" href="{{ asset('favicon-16.png') }}" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="{{ asset('favicon-180.png') }}">
 
     @stack('styles')
 </head>
@@ -23,7 +26,7 @@
                     <div class="header-logo">
                         <div class="logo">
                             <a href="{{ route('home') }}">
-                                <img src="https://collectinfos.org/wp-content/uploads/2023/11/collectinfo.jpg" alt="Collectinfos">
+                                <img src="{{ asset('images/collectinfo-logo.jpg') }}" alt="Collectinfos">
                             </a>
                         </div>
                         <h1 class="site-title"><a href="{{ route('home') }}">Collectinfos</a></h1>

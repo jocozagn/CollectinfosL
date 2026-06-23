@@ -6,32 +6,67 @@
 @section('content')
     <div class="stats-grid">
         <div class="stat-card">
-            <span class="stat-value">{{ $totalContents }}</span>
-            <span class="stat-label">Total contenus</span>
+            <div class="stat-card-inner">
+                <div class="stat-card-icon stat-card-icon--primary"><i class="fa-solid fa-folder-open" aria-hidden="true"></i></div>
+                <div class="stat-card-content">
+                    <span class="stat-label">Total contenus</span>
+                    <span class="stat-value">{{ $totalContents }}</span>
+                </div>
+            </div>
         </div>
         <div class="stat-card stat-success">
-            <span class="stat-value">{{ $publishedContents }}</span>
-            <span class="stat-label">Publiés</span>
+            <div class="stat-card-inner">
+                <div class="stat-card-icon stat-card-icon--success"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+                <div class="stat-card-content">
+                    <span class="stat-label">Publiés</span>
+                    <span class="stat-value">{{ $publishedContents }}</span>
+                </div>
+            </div>
         </div>
         <div class="stat-card stat-warning">
-            <span class="stat-value">{{ $draftContents }}</span>
-            <span class="stat-label">Brouillons</span>
+            <div class="stat-card-inner">
+                <div class="stat-card-icon stat-card-icon--warning"><i class="fa-solid fa-file-pen" aria-hidden="true"></i></div>
+                <div class="stat-card-content">
+                    <span class="stat-label">Brouillons</span>
+                    <span class="stat-value">{{ $draftContents }}</span>
+                </div>
+            </div>
         </div>
         <div class="stat-card">
-            <span class="stat-value">{{ $contactMessages }}</span>
-            <span class="stat-label">Messages contact</span>
+            <div class="stat-card-inner">
+                <div class="stat-card-icon stat-card-icon--info"><i class="fa-solid fa-envelope" aria-hidden="true"></i></div>
+                <div class="stat-card-content">
+                    <span class="stat-label">Messages contact</span>
+                    <span class="stat-value">{{ $contactMessages }}</span>
+                </div>
+            </div>
         </div>
         <div class="stat-card stat-warning">
-            <span class="stat-value">{{ $pendingRequests }}</span>
-            <span class="stat-label">Candidatures en attente</span>
+            <div class="stat-card-inner">
+                <div class="stat-card-icon stat-card-icon--warning"><i class="fa-solid fa-handshake" aria-hidden="true"></i></div>
+                <div class="stat-card-content">
+                    <span class="stat-label">Candidatures en attente</span>
+                    <span class="stat-value">{{ $pendingRequests }}</span>
+                </div>
+            </div>
         </div>
         <div class="stat-card">
-            <span class="stat-value">{{ $newsletterCount }}</span>
-            <span class="stat-label">Abonnés newsletter</span>
+            <div class="stat-card-inner">
+                <div class="stat-card-icon stat-card-icon--primary"><i class="fa-solid fa-newspaper" aria-hidden="true"></i></div>
+                <div class="stat-card-content">
+                    <span class="stat-label">Abonnés newsletter</span>
+                    <span class="stat-value">{{ $newsletterCount }}</span>
+                </div>
+            </div>
         </div>
         <div class="stat-card stat-success">
-            <span class="stat-value">{{ $openInvestigations }}</span>
-            <span class="stat-label">Enquêtes ouvertes</span>
+            <div class="stat-card-inner">
+                <div class="stat-card-icon stat-card-icon--success"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></div>
+                <div class="stat-card-content">
+                    <span class="stat-label">Enquêtes ouvertes</span>
+                    <span class="stat-value">{{ $openInvestigations }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -99,15 +134,18 @@
     </div>
 
     <div class="dashboard-grid">
-        <div class="admin-panel">
+        <div class="admin-panel admin-panel--data">
             <div class="panel-header">
                 <h2>Derniers contenus</h2>
-                <a href="{{ route('admin.contents.create') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus" aria-hidden="true"></i> Publier</a>
+                <div class="panel-header-actions">
+                    <a href="{{ route('admin.contents.create') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus" aria-hidden="true"></i> Publier</a>
+                </div>
             </div>
 
             @if ($recentContents->isEmpty())
                 <p class="empty-state">Aucun contenu. <a href="{{ route('admin.contents.create') }}">Créer le premier</a>.</p>
             @else
+                <div class="table-wrap">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -127,23 +165,27 @@
                                     </span>
                                 </td>
                                 <td>{{ $item->created_at->format('d/m/Y') }}</td>
-                                <td><a href="{{ route('admin.contents.edit', $item) }}">Modifier</a></td>
+                                <td><a href="{{ route('admin.contents.edit', $item) }}" class="btn btn-sm btn-outline">Modifier</a></td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             @endif
         </div>
 
-        <div class="admin-panel">
+        <div class="admin-panel admin-panel--data">
             <div class="panel-header">
                 <h2>Messages récents</h2>
-                <a href="{{ route('admin.messages.index') }}" class="btn btn-secondary btn-sm">Voir tout</a>
+                <div class="panel-header-actions">
+                    <a href="{{ route('admin.messages.index') }}" class="btn btn-secondary btn-sm">Voir tout</a>
+                </div>
             </div>
 
             @if ($recentMessages->isEmpty())
                 <p class="empty-state">Aucun message.</p>
             @else
+                <div class="table-wrap">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -157,23 +199,27 @@
                             <tr>
                                 <td>{{ $item->name }}</td>
                                 <td>{{ Str::limit($item->subject, 35) }}</td>
-                                <td><a href="{{ route('admin.messages.show', $item) }}">Lire</a></td>
+                                <td><a href="{{ route('admin.messages.show', $item) }}" class="btn btn-sm btn-outline">Lire</a></td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             @endif
         </div>
 
-        <div class="admin-panel">
+        <div class="admin-panel admin-panel--data">
             <div class="panel-header">
                 <h2>Candidatures récentes</h2>
-                <a href="{{ route('admin.collaboration.index') }}" class="btn btn-secondary btn-sm">Voir tout</a>
+                <div class="panel-header-actions">
+                    <a href="{{ route('admin.collaboration.index') }}" class="btn btn-secondary btn-sm">Voir tout</a>
+                </div>
             </div>
 
             @if ($recentRequests->isEmpty())
                 <p class="empty-state">Aucune candidature.</p>
             @else
+                <div class="table-wrap">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -202,11 +248,12 @@
                                         @endswitch
                                     </span>
                                 </td>
-                                <td><a href="{{ route('admin.collaboration.show', $item) }}">Voir</a></td>
+                                <td><a href="{{ route('admin.collaboration.show', $item) }}" class="btn btn-sm btn-outline">Voir</a></td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             @endif
         </div>
     </div>
