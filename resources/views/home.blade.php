@@ -12,9 +12,45 @@
                 {{ __('site.hero.slogan_line2') }}"
             </p>
             <div class="hero-buttons">
-                <a href="{{ route('contents.index') }}" class="btn-hero"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> {{ __('site.hero.buy') }}</a>
-                <a href="{{ route('collaboration') }}" class="btn-hero"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> {{ __('site.hero.propose') }}</a>
-                <a href="{{ route('contents.index') }}" class="btn-hero"><i class="fa-solid fa-box" aria-hidden="true"></i> {{ __('site.hero.order') }}</a>
+                <a href="{{ route('home') }}" class="btn-hero"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> {{ __('site.hero.buy') }}</a>
+                <a href="{{ route('submit-content.create') }}" class="btn-hero"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> {{ __('site.hero.propose') }}</a>
+                <a href="{{ route('order-content.create') }}" class="btn-hero"><i class="fa-solid fa-box" aria-hidden="true"></i> {{ __('site.hero.order') }}</a>
+            </div>
+        </div>
+    </section>
+
+    @if (! empty($videoExclusives))
+    <section class="section-video-exclusive">
+        <div class="container">
+            <div class="section-title on-blue">
+                <h4>EXCLUSIVITÉS VIDÉO</h4>
+            </div>
+            <div class="video-exclusive-grid">
+                @foreach ($videoExclusives as $item)
+                    <article class="video-exclusive-card">
+                        @include('partials.content-card', ['item' => $item])
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    {{-- Flux d'actualités --}}
+    <section class="section-flux" id="flux">
+        <div class="container">
+            <div class="section-title">
+                <h4>FLUX D'INFORMATIONS</h4>
+            </div>
+            <nav class="flux-filters" aria-label="Filtrer le flux">
+                @foreach ($fluxCategories as $key => $label)
+                    <a href="{{ route('home', ['flux' => $key]) }}#flux" @class(['flux-filter', 'is-active' => $fluxFilter === $key])>{{ $label }}</a>
+                @endforeach
+            </nav>
+            <div class="products-grid">
+                @foreach ($fluxItems as $item)
+                    @include('partials.content-card', ['item' => $item])
+                @endforeach
             </div>
         </div>
     </section>
@@ -160,17 +196,24 @@
         </div>
     </section>
 
-    {{-- Application --}}
+    {{-- Application Play Store --}}
     <section class="section-app">
         <div class="container">
             <div class="section-title">
-                <h4>TELECHARGEZ NOTRE APPLICATION</h4>
+                <h4>{{ __('site.sections.app') }}</h4>
             </div>
             <div class="app-content">
-                <a href="https://play.google.com/store/apps/details?id=col.lect.info" target="_blank" rel="noopener">
+                <a
+                    href="{{ config('collectinfos.app.play_store_url') }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="app-playstore-link"
+                >
                     <img
-                        src="https://collectinfos.org/wp-content/uploads/2025/08/bouton-telechargement-google-play-store.png"
-                        alt="Télécharger sur Google Play"
+                        src="{{ asset(config('collectinfos.app.play_store_badge')) }}"
+                        alt="Télécharger Collectinfos sur Google Play"
+                        width="280"
+                        height="83"
                         loading="lazy"
                     >
                 </a>

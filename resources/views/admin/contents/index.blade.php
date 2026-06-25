@@ -39,6 +39,7 @@
                         <th>Pays</th>
                         <th>Accès</th>
                         <th>Prix</th>
+                        <th>Exclusivité</th>
                         <th>Statut</th>
                         <th>Actions</th>
                     </tr>
@@ -56,8 +57,26 @@
                             <td>{{ Str::limit($item->title, 45) }}</td>
                             <td>{{ $types[$item->type] ?? $item->type }}</td>
                             <td>{{ $item->country ?? '—' }}</td>
-                            <td>{{ $item->access === 'free' ? 'Libre' : 'Abonnés' }}</td>
-                            <td>{{ $item->price ? number_format($item->price, 0).' €' : '—' }}</td>
+                            <td>{{ $item->accessLabel() }}</td>
+                            <td>
+                                @if ($item->price)
+                                    {{ number_format($item->price, 0).' €' }}
+                                    @if ($item->price_gnf)
+                                        <br><small>{{ number_format($item->price_gnf, 0, ',', ' ') }} GNF</small>
+                                    @endif
+                                @else
+                                    —
+                                @endif
+                            </td>
+                            <td>
+                                @if ($item->isExclusive() && $item->isSoldExclusively())
+                                    <span class="badge badge-sold">Vendu</span>
+                                @elseif ($item->isExclusive())
+                                    <span class="badge badge-exclusive">Exclusif</span>
+                                @else
+                                    —
+                                @endif
+                            </td>
                             <td>
                                 <span @class(['badge', 'badge-published' => $item->status === 'published', 'badge-draft' => $item->status === 'draft'])>
                                     {{ $item->status === 'published' ? 'Publié' : 'Brouillon' }}

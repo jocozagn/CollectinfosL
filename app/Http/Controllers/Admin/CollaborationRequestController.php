@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CollaborationRequest;
-use App\Services\CollaborationAcceptanceService;
+use App\Services\CollaborationRequestService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class CollaborationRequestController extends Controller
 {
     public function __construct(
-        private CollaborationAcceptanceService $acceptanceService
+        private CollaborationRequestService $requestService
     ) {}
 
     public function index(Request $request): View
@@ -47,10 +47,11 @@ class CollaborationRequestController extends Controller
             'status' => ['required', 'in:pending,accepted,rejected'],
         ]);
 
-        $previousStatus = $collaboration->status;
-        $collaboration->update($data);
-
-        $this->acceptanceService->handleStatusChange($collaboration->fresh(), $previousStatus, $data['status']);
+        try {
+            $this->requestService->updateStatus($collaboration, $data['status']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
 
         return redirect()->route('admin.collaboration.show', $collaboration)
             ->with('success', 'Statut mis à jour.');

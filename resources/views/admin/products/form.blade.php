@@ -31,6 +31,35 @@
         </div>
 
         <div class="form-group">
+            <label class="checkbox-label">
+                <input type="checkbox" name="is_subscribable" value="1" @checked(old('is_subscribable', $product->is_subscribable ?? false))>
+                Abonnement en ligne (paiement Djomy)
+            </label>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="price_eur">Prix EUR (abonnement)</label>
+                <input type="number" id="price_eur" name="price_eur" min="0" step="0.01" value="{{ old('price_eur', $product->price_eur) }}">
+            </div>
+            <div class="form-group">
+                <label for="price_gnf">Prix GNF (Djomy)</label>
+                <input type="number" id="price_gnf" name="price_gnf" min="0" step="1" value="{{ old('price_gnf', $product->price_gnf) }}">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="billing_months">Durée (mois)</label>
+                <input type="number" id="billing_months" name="billing_months" min="1" max="36" value="{{ old('billing_months', $product->billing_months ?? 1) }}">
+            </div>
+            <div class="form-group">
+                <label for="discount_percent">Réduction contenus payants (%)</label>
+                <input type="number" id="discount_percent" name="discount_percent" min="0" max="100" value="{{ old('discount_percent', $product->discount_percent ?? 10) }}">
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="icon">Icône Font Awesome *</label>
             <input type="text" id="icon" name="icon" value="{{ old('icon', $product->icon) }}" placeholder="fa-newspaper" required>
             <small class="form-hint">Ex: fa-newspaper, fa-film, fa-tower-broadcast</small>

@@ -71,10 +71,24 @@ class SiteProductController extends Controller
             'icon' => ['required', 'string', 'max:50'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'is_active' => ['nullable', 'boolean'],
+            'is_subscribable' => ['nullable', 'boolean'],
+            'price_eur' => ['nullable', 'numeric', 'min:0'],
+            'price_gnf' => ['nullable', 'integer', 'min:0'],
+            'billing_months' => ['nullable', 'integer', 'min:1', 'max:36'],
+            'discount_percent' => ['nullable', 'integer', 'min:0', 'max:100'],
         ]);
 
         $data['is_active'] = $request->boolean('is_active', true);
+        $data['is_subscribable'] = $request->boolean('is_subscribable', false);
         $data['sort_order'] = (int) ($data['sort_order'] ?? 0);
+        $data['billing_months'] = (int) ($data['billing_months'] ?? 1);
+        $data['discount_percent'] = (int) ($data['discount_percent'] ?? 10);
+
+        if ($data['is_subscribable'] && empty($data['price_eur'])) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'price_eur' => 'Indiquez le prix EUR pour un abonnement en ligne.',
+            ]);
+        }
 
         return $data;
     }

@@ -6,6 +6,11 @@ return [
         'email' => 'collectinfos.afrique@gmail.com',
     ],
 
+    'app' => [
+        'play_store_url' => 'https://play.google.com/store/apps/details?id=col.lect.info',
+        'play_store_badge' => 'images/google-play-badge.png',
+    ],
+
     'stats' => [
         ['value' => 318, 'label' => 'Corresponants'],
         ['value' => 18, 'label' => 'Pays'],
@@ -207,5 +212,61 @@ return [
             ['title' => 'Transparence méthodologique', 'text' => 'Publication des éléments de preuve et des limites de chaque vérification.'],
             ['title' => 'Indépendance éditoriale', 'text' => 'Analyses sans influence politique ou commerciale.'],
         ],
+    ],
+
+    /*
+    | Prix catalogue en EUR + GNF (saisis à la publication par l'admin).
+    | Si price_gnf est vide, repli sur EUR_TO_GNF_RATE pour l'affichage et Djomy.
+    */
+    'currency' => [
+        'catalog' => 'EUR',
+        'payment' => 'GNF',
+        'eur_to_gnf' => (float) env('EUR_TO_GNF_RATE', 10000),
+    ],
+
+    'wallet' => [
+        'min_payout_eur' => (float) env('WALLET_MIN_PAYOUT_EUR', 50),
+    ],
+
+    'payment' => [
+        'commission_rate' => 0.15,
+        'methods' => [
+            'card' => ['label' => 'Carte bancaire', 'icon' => 'fa-credit-card', 'logo' => 'images/payments/card.png'],
+            'orange_money' => ['label' => 'Orange Money', 'icon' => 'fa-mobile-screen', 'logo' => 'images/payments/orange-money.svg'],
+            'wave' => ['label' => 'Wave', 'icon' => 'fa-mobile-screen', 'logo' => 'images/payments/wave.png'],
+            'mtn' => ['label' => 'MTN Mobile Money', 'icon' => 'fa-mobile-screen', 'logo' => 'images/payments/mtn.png'],
+            'paypal' => ['label' => 'PayPal', 'icon' => 'fa-brands fa-paypal', 'coming_soon' => true],
+            'bank_transfer' => ['label' => 'Virement bancaire', 'icon' => 'fa-building-columns', 'logo' => 'images/payments/bank-transfer.svg', 'coming_soon' => true],
+        ],
+    ],
+
+    'account_types' => [
+        'journalist' => 'Journaliste freelance',
+        'correspondent' => 'Correspondant local',
+        'photographer' => 'Photographe',
+        'videographer' => 'Vidéaste',
+        'expert' => 'Expert',
+        'media' => 'Média / Rédaction',
+        'agency' => 'Agence de presse',
+        'organization' => 'Organisation / ONG',
+        'individual' => 'Particulier',
+    ],
+
+    'buyer_structure_types' => [
+        'print' => 'Presse écrite',
+        'tv' => 'Télévision',
+        'radio' => 'Radio',
+        'online' => 'Presse en ligne',
+        'agency' => 'Agence de presse',
+        'ngo' => 'ONG',
+        'public' => 'Institution publique',
+        'other' => 'Autre',
+    ],
+
+    'rights_options' => [
+        'national' => 'National',
+        'international' => 'International',
+        'web' => 'Web uniquement',
+        'all' => 'Tous supports',
     ],
 ];

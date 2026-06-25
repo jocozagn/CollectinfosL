@@ -70,11 +70,32 @@
                         <select id="access" name="access" required>
                             <option value="free" @selected(old('access', $content->access) === 'free')>Libre</option>
                             <option value="subscriber" @selected(old('access', $content->access) === 'subscriber')>Réservé aux abonnés</option>
+                            <option value="exclusive" @selected(old('access', $content->access) === 'exclusive')>Exclusif — 1 seul acheteur</option>
                         </select>
+                        <small class="form-hint">L'exclusivité ne peut être achetée qu'une seule fois (vidéo, article, reportage…).</small>
                     </div>
                     <div class="form-group">
                         <label for="price">Prix (€)</label>
                         <input type="number" id="price" name="price" step="0.01" min="0" value="{{ old('price', $content->price) }}">
+                        @error('price')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+                        @if ($content->isExclusive() && $content->isSoldExclusively())
+                            <small class="form-hint">
+                                Exclusivité vendue
+                                @if ($content->exclusiveBuyer())
+                                    à {{ $content->exclusiveBuyer()->name }}
+                                @endif.
+                            </small>
+                        @endif
+                    </div>
+                    <div class="form-group">
+                        <label for="price_gnf">Prix (GNF)</label>
+                        <input type="number" id="price_gnf" name="price_gnf" step="1" min="0" value="{{ old('price_gnf', $content->price_gnf) }}" placeholder="ex: 500 000">
+                        <small class="form-hint">Montant encaissé via Djomy. Obligatoire si le prix en € est renseigné.</small>
+                        @error('price_gnf')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 

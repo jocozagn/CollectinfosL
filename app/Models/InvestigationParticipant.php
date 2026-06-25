@@ -7,10 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InvestigationParticipant extends Model
 {
+    public const ROLE_LEAD = 'lead';
+
+    public const ROLE_CONTRIBUTOR = 'contributor';
+
+    public const ROLE_VIEWER = 'viewer';
+
     protected $fillable = [
         'investigation_id',
         'user_id',
         'collaboration_request_id',
+        'role',
         'joined_at',
     ];
 
@@ -34,5 +41,14 @@ class InvestigationParticipant extends Model
     public function collaborationRequest(): BelongsTo
     {
         return $this->belongsTo(CollaborationRequest::class);
+    }
+
+    public function roleLabel(): string
+    {
+        return match ($this->role) {
+            self::ROLE_LEAD => 'Coordinateur',
+            self::ROLE_VIEWER => 'Lecteur',
+            default => 'Contributeur',
+        };
     }
 }

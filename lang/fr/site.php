@@ -20,6 +20,11 @@ return [
         'account' => 'Mon compte',
         'menu' => 'Menu',
         'language' => 'Langue',
+        'mobile_tabbar' => 'Navigation mobile',
+        'tab_home' => 'Accueil',
+        'tab_explore' => 'Explorer',
+        'tab_search' => 'Recherche',
+        'tab_profile' => 'Profil',
     ],
 
     'hero' => [

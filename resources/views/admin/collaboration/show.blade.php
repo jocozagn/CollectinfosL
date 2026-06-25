@@ -44,7 +44,16 @@
             </div>
             <div class="detail-item">
                 <label>Enquête</label>
-                <p>{{ $request->investigation?->title ?? '—' }}</p>
+                <p>
+                    @if ($request->investigation)
+                        {{ $request->investigation->title }}
+                        @if ($request->status === 'accepted')
+                            <br><small>Les participants peuvent collaborer via l'espace sécurisé de l'enquête (messagerie, fichiers, validation des contenus).</small>
+                        @endif
+                    @else
+                        —
+                    @endif
+                </p>
             </div>
             <div class="detail-item">
                 <label>Reçue le</label>

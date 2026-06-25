@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ __('site.meta_description') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#4c87a7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Collectinfos">
     <title>@yield('title', 'Collectinfos – '.__('site.tagline'))</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,10 +21,11 @@
     <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png" sizes="32x32">
     <link rel="icon" href="{{ asset('favicon-16.png') }}" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="{{ asset('favicon-180.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
 
     @stack('styles')
 </head>
-<body>
+<body class="has-mobile-tabbar">
     <header class="site-header" id="site-header">
         <div class="header-main">
             <div class="container">
@@ -138,6 +145,28 @@
         </div>
     </footer>
 
+    <nav class="mobile-tabbar" aria-label="{{ __('site.nav.mobile_tabbar') }}">
+        <a href="{{ route('home') }}" @class(['mobile-tabbar__item', 'is-active' => request()->routeIs('home')])>
+            <i class="fa-solid fa-house" aria-hidden="true"></i>
+            <span>{{ __('site.nav.tab_home') }}</span>
+        </a>
+        <a href="{{ route('contents.index') }}" @class(['mobile-tabbar__item', 'is-active' => request()->routeIs('contents.*')])>
+            <i class="fa-solid fa-compass" aria-hidden="true"></i>
+            <span>{{ __('site.nav.tab_explore') }}</span>
+        </a>
+        <a href="{{ route('submit-content.create') }}" @class(['mobile-tabbar__item', 'mobile-tabbar__item--action', 'is-active' => request()->routeIs('submit-content.*')]) aria-label="Publier un contenu">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        </a>
+        <a href="{{ route('contents.index') }}#catalog-search" @class(['mobile-tabbar__item', 'is-active' => request()->routeIs('contents.index') && request()->has('q')])>
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <span>{{ __('site.nav.tab_search') }}</span>
+        </a>
+        <a href="{{ route('account') }}" @class(['mobile-tabbar__item', 'is-active' => request()->routeIs('account*')])>
+            <i class="fa-solid fa-user" aria-hidden="true"></i>
+            <span>{{ __('site.nav.tab_profile') }}</span>
+        </a>
+    </nav>
+
     <button type="button" class="scroll-top" id="scroll-top" aria-label="Retour en haut">
         <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
     </button>
@@ -164,7 +193,17 @@
         </div>
     </div>
 
+    <script>
+        window.CollectinfosFavorites = {
+            authenticated: @json(auth()->check()),
+            slugs: @json($userFavoriteSlugs ?? []),
+            toggleUrlTemplate: @json(route('favorites.toggle', ['content' => '__SLUG__'])),
+            syncUrl: @json(route('favorites.sync')),
+            storageKey: 'collectinfos_favorites',
+        };
+    </script>
     <script src="{{ asset('js/collectinfos.js') }}"></script>
+    <script src="{{ asset('js/pwa.js') }}" defer></script>
     @stack('scripts')
 </body>
 </html>

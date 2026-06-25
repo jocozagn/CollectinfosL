@@ -44,6 +44,28 @@ class Investigation extends Model
         return $this->hasMany(CollaborationRequest::class);
     }
 
+    public function pendingJoinRequests(): HasMany
+    {
+        return $this->requests()
+            ->where('type', 'join')
+            ->where('status', 'pending');
+    }
+
+    public function participantsCount(): int
+    {
+        return $this->participants()->count();
+    }
+
+    public function remainingPlaces(): int
+    {
+        return max(0, $this->places - $this->participantsCount());
+    }
+
+    public function hasAvailablePlace(): bool
+    {
+        return $this->remainingPlaces() > 0;
+    }
+
     public function participants(): HasMany
     {
         return $this->hasMany(InvestigationParticipant::class);
@@ -52,8 +74,87 @@ class Investigation extends Model
     public function participantUsers()
     {
         return $this->belongsToMany(User::class, 'investigation_participants')
-            ->withPivot(['collaboration_request_id', 'joined_at'])
+            ->withPivot(['collaboration_request_id', 'role', 'joined_at'])
             ->withTimestamps();
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(InvestigationMessage::class);
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(InvestigationFile::class);
+    }
+
+    public function drafts(): HasMany
+    {
+        return $this->hasMany(InvestigationDraft::class);
+    }
+
+    public function isOwner(User $user): bool
+    {
+        return $this->user_id === $user->id;
+    }
+
+    public function isMember(User $user): bool
+    {
+        if ($this->isOwner($user)) {
+            return true;
+        }
+
+        return $this->participants()->where('user_id', $user->id)->exists();
+    }
+
+    public function participantRecordFor(User $user): ?InvestigationParticipant
+    {
+        return $this->participants()->where('user_id', $user->id)->first();
+    }
+
+    public function memberRole(User $user): ?string
+    {
+        if ($this->isOwner($user)) {
+            return 'owner';
+        }
+
+        return $this->participantRecordFor($user)?->role;
+    }
+
+    public function canContribute(User $user): bool
+    {
+        if ($this->isOwner($user)) {
+            return true;
+        }
+
+        $role = $this->memberRole($user);
+
+        return in_array($role, ['lead', 'contributor'], true);
+    }
+
+    public function canManageTeam(User $user): bool
+    {
+        if ($this->isOwner($user)) {
+            return true;
+        }
+
+        return $this->memberRole($user) === 'lead';
+    }
+
+    public function canReviewDrafts(User $user): bool
+    {
+        return $this->canManageTeam($user);
+    }
+
+    public function roleLabelFor(User $user): string
+    {
+        return match ($this->memberRole($user)) {
+            'owner' => 'Porteur',
+            'lead' => 'Coordinateur',
+            'contributor' => 'Contributeur',
+            'viewer' => 'Lecteur',
+            default => 'Membre',
+        };
     }
 
     public function scopeOpen($query)

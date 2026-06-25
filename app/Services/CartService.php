@@ -3,11 +3,16 @@
 namespace App\Services;
 
 use App\Models\Content;
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 class CartService
 {
     private const SESSION_KEY = 'cart';
+
+    public function __construct(
+        private SubscriptionService $subscriptions,
+    ) {}
 
     public function items(): Collection
     {
@@ -29,9 +34,11 @@ class CartService
         return count($this->ids());
     }
 
-    public function total(): float
+    public function total(?User $user = null): float
     {
-        return (float) $this->items()->sum(fn (Content $content) => (float) $content->price);
+        return (float) $this->items()->sum(
+            fn (Content $content) => $this->subscriptions->effectiveEurPrice($content, $user)
+        );
     }
 
     public function has(int $contentId): bool
@@ -41,7 +48,7 @@ class CartService
 
     public function add(Content $content): void
     {
-        if (! $content->isPaid()) {
+        if (! $content->isPurchasable()) {
             return;
         }
 
@@ -66,6 +73,19 @@ class CartService
     public function clear(): void
     {
         session()->forget(self::SESSION_KEY);
+    }
+
+    public function itemsFromIds(array $ids): Collection
+    {
+        if ($ids === []) {
+            return collect();
+        }
+
+        return Content::query()
+            ->whereIn('id', $ids)
+            ->get()
+            ->sortBy(fn (Content $content) => array_search($content->id, $ids, true))
+            ->values();
     }
 
   /** @return list<int> */

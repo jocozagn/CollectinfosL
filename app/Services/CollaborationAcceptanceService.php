@@ -45,6 +45,7 @@ class CollaborationAcceptanceService
             ],
             [
                 'collaboration_request_id' => $request->id,
+                'role' => InvestigationParticipant::ROLE_CONTRIBUTOR,
                 'joined_at' => now(),
             ]
         );
@@ -90,6 +91,7 @@ class CollaborationAcceptanceService
                 ],
                 [
                     'collaboration_request_id' => $request->id,
+                    'role' => InvestigationParticipant::ROLE_CONTRIBUTOR,
                     'joined_at' => now(),
                 ]
             );

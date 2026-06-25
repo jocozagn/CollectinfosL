@@ -17,8 +17,8 @@
                     <h2 class="filters-title"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrer</h2>
 
                     <div class="filter-group">
-                        <label for="q">Recherche</label>
-                        <input type="text" id="q" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Titre, pays, mot-clé…">
+                        <label for="catalog-search">Recherche</label>
+                        <input type="text" id="catalog-search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Titre, pays, mot-clé…">
                     </div>
 
                     <div class="filter-group">
@@ -57,6 +57,7 @@
                             <option value="">Tous les accès</option>
                             <option value="free" @selected(($filters['access'] ?? '') === 'free')>Gratuit</option>
                             <option value="subscriber" @selected(($filters['access'] ?? '') === 'subscriber')>Abonnés</option>
+                            <option value="exclusive" @selected(($filters['access'] ?? '') === 'exclusive')>Exclusif</option>
                         </select>
                     </div>
 

@@ -8,7 +8,7 @@
         $themeLabels = \App\Models\Content::themeLabels();
         $categoryLabels = \App\Models\Content::categoryLabels();
         $embedUrl = $content->youtubeEmbedId() ? 'https://www.youtube.com/embed/' . $content->youtubeEmbedId() : null;
-        $mediaUrl = $content->mediaUrl();
+        $mediaUrl = $hasAccess ? $content->deliveryMediaUrl(auth()->user()) : null;
     @endphp
 
     <article class="content-detail">
@@ -35,6 +35,10 @@
                     </span>
                     @if ($content->isFree())
                         <span class="badge badge-free"><i class="fa-solid fa-gift" aria-hidden="true"></i> Gratuit</span>
+                    @elseif ($content->isExclusive() && $content->isSoldExclusively())
+                        <span class="badge badge-sold"><i class="fa-solid fa-lock" aria-hidden="true"></i> Exclusivité vendue</span>
+                    @elseif ($content->isExclusive())
+                        <span class="badge badge-exclusive"><i class="fa-solid fa-gem" aria-hidden="true"></i> Exclusif — {{ number_format($content->price, 0) }} €</span>
                     @elseif ($content->isPaid())
                         <span class="badge badge-paid"><i class="fa-solid fa-tag" aria-hidden="true"></i> {{ number_format($content->price, 0) }} €</span>
                     @elseif ($content->access === 'subscriber')
@@ -90,7 +94,13 @@
                                 <div class="paywall-overlay">
                                     <i class="fa-solid fa-lock paywall-lock" aria-hidden="true"></i>
                                     <h2>{{ __('site.contents.premium') }}</h2>
-                                    <p>Ce contenu est disponible à l'achat ou pour les abonnés Collectinfos.</p>
+                                    <p>
+                                        @if ($content->isExclusive())
+                                            Cette exclusivité est vendue à un seul acheteur. Une fois achetée, elle ne sera plus disponible.
+                                        @else
+                                            Ce contenu est disponible à l'achat ou pour les abonnés Collectinfos.
+                                        @endif
+                                    </p>
                                     <div class="paywall-actions">
                                         @if ($content->hasPreview())
                                             <button
@@ -107,13 +117,28 @@
                                                 <span>{{ __('site.contents.preview') }}</span>
                                             </button>
                                         @endif
-                                        <form action="{{ route('cart.add', $content) }}" method="POST" class="paywall-form">
-                                            @csrf
-                                            <button type="submit" class="btn-paywall btn-paywall--buy">
-                                                <span class="btn-paywall-icon" aria-hidden="true"><i class="fa-solid fa-cart-shopping"></i></span>
-                                                <span>{{ __('site.contents.buy') }} — {{ number_format($content->price, 0) }} €</span>
-                                            </button>
-                                        </form>
+                                        @if ($content->isPurchasable())
+                                            <form action="{{ route('cart.add', $content) }}" method="POST" class="paywall-form">
+                                                @csrf
+                                                <button type="submit" class="btn-paywall btn-paywall--buy">
+                                                    <span class="btn-paywall-icon" aria-hidden="true"><i class="fa-solid fa-cart-shopping"></i></span>
+                                                    <span>
+                                                        @if ($content->isExclusive())
+                                                            {{ __('site.contents.buy') }} l'exclusivité — {{ number_format($content->price, 0) }} €
+                                                        @else
+                                                            {{ __('site.contents.buy') }} — {{ number_format($content->price, 0) }} €
+                                                        @endif
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        @elseif ($content->isSubscriberOnly() && ! $hasAccess)
+                                            <a href="{{ route('products') }}" class="btn-paywall btn-paywall--buy">
+                                                <span class="btn-paywall-icon" aria-hidden="true"><i class="fa-solid fa-id-card"></i></span>
+                                                <span>S'abonner pour accéder</span>
+                                            </a>
+                                        @elseif ($content->isExclusive() && $content->isSoldExclusively())
+                                            <p class="paywall-sold-notice"><i class="fa-solid fa-lock" aria-hidden="true"></i> Cette exclusivité a déjà été acquise par un acheteur.</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -139,22 +164,42 @@
                 <aside class="content-sidebar">
                     <div class="sidebar-box">
                         <h3>Actions</h3>
-                        @if ($content->isPaid() && ! $hasAccess)
+                        @if ($content->isPurchasable())
                             <form action="{{ route('cart.add', $content) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="sidebar-btn sidebar-btn--primary">
-                                    <i class="fa-solid fa-cart-plus" aria-hidden="true"></i> {{ __('site.contents.add_cart') }}
+                                    <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                                    @if ($content->isExclusive())
+                                        Acheter l'exclusivité
+                                    @else
+                                        {{ __('site.contents.add_cart') }}
+                                    @endif
                                 </button>
                             </form>
-                        @elseif ($hasAccess && $content->isPaid())
+                        @elseif ($content->isExclusive() && $content->isSoldExclusively())
+                            <span class="sidebar-badge sidebar-badge--sold"><i class="fa-solid fa-lock" aria-hidden="true"></i> Exclusivité vendue</span>
+                        @elseif ($hasAccess && ($content->isPaid() || $content->isExclusive()))
                             <span class="sidebar-badge"><i class="fa-solid fa-check" aria-hidden="true"></i> {{ __('site.contents.purchased') }}</span>
+                            @if ($content->hasDownloadableFile())
+                                <a href="{{ route('contents.download', $content) }}" class="sidebar-btn sidebar-btn--primary">
+                                    <i class="fa-solid fa-download" aria-hidden="true"></i> Télécharger
+                                </a>
+                            @endif
                         @else
                             <a href="{{ route('contents.index') }}" class="sidebar-btn">
                                 <i class="fa-solid fa-table-cells" aria-hidden="true"></i> Tous les contenus
                             </a>
                         @endif
-                        <button type="button" class="sidebar-btn">
-                            <i class="fa-regular fa-heart" aria-hidden="true"></i> Ajouter aux favoris
+                        <button
+                            type="button"
+                            class="sidebar-btn action-favorite"
+                            data-slug="{{ $content->slug }}"
+                            title="Ajouter aux favoris"
+                            aria-label="Ajouter aux favoris"
+                            aria-pressed="false"
+                        >
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                            <span class="favorite-label">Ajouter aux favoris</span>
                         </button>
                         <button type="button" class="sidebar-btn" onclick="navigator.share?.({title: '{{ addslashes($content->title) }}', url: location.href})">
                             <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> Partager

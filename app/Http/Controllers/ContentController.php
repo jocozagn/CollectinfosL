@@ -10,7 +10,7 @@ class ContentController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Content::published()->latest('published_at');
+        $query = Content::published()->withCount('purchases')->latest('published_at');
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -50,9 +50,11 @@ class ContentController extends Controller
         ]);
     }
 
-    public function show(string $slug): View
+    public function show(Content $content): View
     {
-        $content = Content::published()->with(['author', 'translations'])->where('slug', $slug)->firstOrFail();
+        abort_unless($content->isPublished(), 404);
+
+        $content->load(['author', 'translations']);
 
         $related = Content::published()
             ->with('translations')

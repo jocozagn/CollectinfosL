@@ -64,8 +64,8 @@ class CollaborationController extends Controller
         ]);
 
         $msg = $data['type'] === 'propose'
-            ? 'Votre proposition d\'enquête a été reçue. Consultez votre compte pour suivre sa validation.'
-            : 'Votre candidature a été enregistrée. Consultez votre compte pour suivre son statut.';
+            ? 'Votre proposition d\'enquête a été reçue. Une fois acceptée, vous accéderez à l\'espace collaboratif (discussion, fichiers, validation des contenus).'
+            : 'Votre candidature a été enregistrée. Le porteur de l\'enquête ou l\'équipe Collectinfos l\'examinera. Si elle est acceptée, vous pourrez collaborer via l\'espace sécurisé de l\'enquête.';
 
         $redirect = $user && $user->isJournalist()
             ? redirect()->route('account', ['tab' => 'applications'])->with('account_success', $msg)

@@ -15,7 +15,7 @@ class ContentController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Content::query()->latest();
+        $query = Content::query()->withCount('purchases')->latest();
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -125,7 +125,7 @@ class ContentController extends Controller
 
     private function validated(Request $request, ?int $ignoreId = null): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'summary' => ['nullable', 'string', 'max:1000'],
             'body' => ['nullable', 'string'],
@@ -133,8 +133,9 @@ class ContentController extends Controller
             'theme' => ['nullable', Rule::exists('taxonomies', 'slug')->where('kind', Taxonomy::KIND_THEME)->where('is_active', true)],
             'country' => ['nullable', 'string', 'max:100'],
             'category' => ['nullable', Rule::exists('taxonomies', 'slug')->where('kind', Taxonomy::KIND_CATEGORY)->where('is_active', true)],
-            'access' => ['required', 'in:free,subscriber'],
+            'access' => ['required', 'in:free,subscriber,exclusive'],
             'price' => ['nullable', 'numeric', 'min:0'],
+            'price_gnf' => ['nullable', 'integer', 'min:0'],
             'duration' => ['nullable', 'string', 'max:50'],
             'status' => ['required', 'in:draft,published'],
             'preview_enabled' => ['nullable', 'boolean'],
@@ -146,6 +147,20 @@ class ContentController extends Controller
             'media_file' => ['nullable', 'file', 'max:512000'],
             'media_url' => ['nullable', 'url', 'max:500'],
         ]);
+
+        if ($data['access'] === 'exclusive' && (empty($data['price']) || (float) $data['price'] <= 0)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'price' => 'Un prix est obligatoire pour une exclusivité vendue à un seul acheteur.',
+            ]);
+        }
+
+        if ((float) ($data['price'] ?? 0) > 0 && empty($data['price_gnf'])) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'price_gnf' => 'Indiquez le prix en GNF pour le paiement Djomy.',
+            ]);
+        }
+
+        return $data;
     }
 
     private function handleUploads(Request $request, array $data, ?Content $content = null): array

@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTranslations;
+use App\Services\CurrencyService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -24,6 +26,7 @@ class Content extends Model
         'category',
         'access',
         'price',
+        'price_gnf',
         'duration',
         'thumbnail',
         'media_path',
@@ -39,6 +42,7 @@ class Content extends Model
     {
         return [
             'price' => 'decimal:2',
+            'price_gnf' => 'integer',
             'published_at' => 'datetime',
             'preview_enabled' => 'boolean',
             'preview_seconds' => 'integer',
@@ -50,9 +54,29 @@ class Content extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if (request()->is('admin/*')) {
+            return parent::resolveRouteBinding($value, $field);
+        }
+
+        return static::published()->where($field ?? $this->getRouteKeyName(), $value)->firstOrFail();
+    }
+
     public function purchases(): HasMany
     {
         return $this->hasMany(ContentPurchase::class);
+    }
+
+    public function favoritedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'content_favorites')
+            ->withTimestamps();
     }
 
     public function userHasAccess(?User $user = null): bool
@@ -61,11 +85,15 @@ class Content extends Model
             return true;
         }
 
-        if ($this->isPaid()) {
+        if ($this->access === 'subscriber') {
+            return $user !== null && $user->hasActiveSubscription();
+        }
+
+        if ($this->isPaid() || $this->isExclusive()) {
             return $user !== null && $user->hasPurchased($this);
         }
 
-        return $this->access !== 'subscriber';
+        return true;
     }
 
     public function scopePublished($query)
@@ -90,6 +118,65 @@ class Content extends Model
     public function isPaid(): bool
     {
         return ! is_null($this->price) && (float) $this->price > 0;
+    }
+
+    public function isExclusive(): bool
+    {
+        return $this->access === 'exclusive';
+    }
+
+    public function isSoldExclusively(): bool
+    {
+        if (! $this->isExclusive()) {
+            return false;
+        }
+
+        if (isset($this->purchases_count)) {
+            return $this->purchases_count > 0;
+        }
+
+        return $this->purchases()->exists();
+    }
+
+    public function exclusiveBuyer(): ?User
+    {
+        return $this->purchases()->with('user')->oldest('purchased_at')->first()?->user;
+    }
+
+    public function isPurchasable(): bool
+    {
+        if (! $this->isPublished() || ! $this->isPaid()) {
+            return false;
+        }
+
+        if ($this->access === 'subscriber') {
+            return false;
+        }
+
+        if ($this->isExclusive() && $this->isSoldExclusively()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isSubscriberOnly(): bool
+    {
+        return $this->access === 'subscriber';
+    }
+
+    public static function accessLabels(): array
+    {
+        return [
+            'free' => 'Libre',
+            'subscriber' => 'Abonnés',
+            'exclusive' => 'Exclusif (1 acheteur)',
+        ];
+    }
+
+    public function accessLabel(): string
+    {
+        return static::accessLabels()[$this->access] ?? $this->access;
     }
 
     public function thumbnailUrl(): ?string
@@ -195,12 +282,15 @@ class Content extends Model
             'slug' => $this->slug,
             'image' => $this->thumbnailUrl() ?? 'https://via.placeholder.com/300x300?text=Collectinfos',
             'price' => $this->price,
-            'action' => $this->isPaid() ? 'cart' : 'read',
+            'action' => $this->isPurchasable() ? 'cart' : 'read',
             'type' => $this->type,
             'type_label' => $typeLabels[$this->type] ?? ucfirst($this->type),
             'access' => $this->access,
             'is_free' => $this->isFree(),
             'is_paid' => $this->isPaid(),
+            'is_exclusive' => $this->isExclusive(),
+            'is_exclusive_sold' => $this->isSoldExclusively(),
+            'is_purchasable' => $this->isPurchasable(),
             'preview_enabled' => $this->hasPreview(),
             'preview_seconds' => max(5, min(120, (int) ($this->preview_seconds ?: 15))),
             'preview_mode' => $this->previewMode(),
@@ -221,6 +311,47 @@ class Content extends Model
         }
 
         return asset('storage/'.$path);
+    }
+
+    public function localMediaPath(): ?string
+    {
+        if (! $this->media_path || str_starts_with($this->media_path, 'http')) {
+            return null;
+        }
+
+        return $this->media_path;
+    }
+
+    public function hasDownloadableFile(): bool
+    {
+        $path = $this->localMediaPath();
+
+        return $path !== null && \Illuminate\Support\Facades\Storage::disk('public')->exists($path);
+    }
+
+    public function downloadFilename(): string
+    {
+        $extension = pathinfo((string) $this->media_path, PATHINFO_EXTENSION);
+        $base = Str::slug($this->title) ?: 'contenu-collectinfos';
+
+        return $extension ? $base.'.'.$extension : $base;
+    }
+
+    public function deliveryMediaUrl(?User $user = null): ?string
+    {
+        if (! $this->userHasAccess($user)) {
+            return null;
+        }
+
+        if ($this->youtubeEmbedId($this->media_path)) {
+            return $this->mediaUrl();
+        }
+
+        if ($this->hasDownloadableFile()) {
+            return route('contents.media', $this->slug);
+        }
+
+        return $this->mediaUrl();
     }
 
     public static function generateSlug(string $title): string

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#4c87a7">
+    <title>Hors ligne – Collectinfos</title>
+    <style>
+        :root {
+            --ci-primary: #4c87a7;
+            --ci-text: #5a5a5a;
+            --ci-text-dark: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: 'Work Sans', system-ui, sans-serif;
+            color: var(--ci-text);
+            background: linear-gradient(180deg, #f8fafb 0%, #fff 100%);
+            text-align: center;
+        }
+
+        .offline-card {
+            max-width: 420px;
+            padding: 32px 24px;
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(76, 135, 167, 0.12);
+        }
+
+        .offline-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(76, 135, 167, 0.12);
+            color: var(--ci-primary);
+            font-size: 2rem;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: 1.5rem;
+            color: var(--ci-text-dark);
+        }
+
+        p {
+            margin: 0 0 24px;
+            line-height: 1.6;
+        }
+
+        button {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 6px;
+            background: var(--ci-primary);
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-card">
+        <div class="offline-icon" aria-hidden="true">&#128246;</div>
+        <h1>Vous êtes hors ligne</h1>
+        <p>Collectinfos nécessite une connexion pour afficher les contenus récents. Vérifiez votre réseau puis réessayez.</p>
+        <button type="button" onclick="window.location.reload()">Réessayer</button>
+    </div>
+</body>
+</html>

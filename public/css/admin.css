@@ -624,6 +624,8 @@ body.admin-body *::-webkit-scrollbar-thumb:hover {
 .badge-rejected { background: #fee2e2; color: #991b1b; }
 .badge-open { background: #dbeafe; color: #1e40af; }
 .badge-closed { background: #e5e7eb; color: #374151; }
+.badge-exclusive { background: #4c87a7; color: #fff; }
+.badge-sold { background: #e5e7eb; color: #374151; }
 
 .detail-grid {
     display: grid;

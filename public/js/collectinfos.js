@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
+    initCiFileUploads();
+    initCatalogSearchFocus();
+
     // Sélecteur de langue
     const langSelect = document.getElementById('lang-select');
     const langForm = document.querySelector('.lang-switcher-form');
@@ -236,4 +239,277 @@ document.addEventListener('DOMContentLoaded', function () {
         checkbox.addEventListener('change', syncOtherField);
         syncOtherField();
     });
+
+    initFavorites();
 });
+
+function initFavorites() {
+    const config = window.CollectinfosFavorites;
+    if (!config) {
+        return;
+    }
+
+    const storageKey = config.storageKey || 'collectinfos_favorites';
+
+    function loadLocal() {
+        try {
+            return JSON.parse(localStorage.getItem(storageKey) || '[]');
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function saveLocal(slugSet) {
+        localStorage.setItem(storageKey, JSON.stringify([...slugSet]));
+    }
+
+    function csrfToken() {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
+    function toggleUrl(slug) {
+        return config.toggleUrlTemplate.replace('__SLUG__', encodeURIComponent(slug));
+    }
+
+    let slugs = new Set(config.authenticated ? (config.slugs || []) : loadLocal());
+
+    function applyButton(btn, active) {
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('fa-regular', !active);
+            icon.classList.toggle('fa-solid', active);
+        }
+
+        const label = btn.querySelector('.favorite-label');
+        const text = active ? 'Retirer des favoris' : 'Ajouter aux favoris';
+        if (label) {
+            label.textContent = text;
+        }
+
+        btn.title = text;
+        btn.setAttribute('aria-label', text);
+    }
+
+    function refreshAll() {
+        document.querySelectorAll('.action-favorite[data-slug]').forEach(function (btn) {
+            applyButton(btn, slugs.has(btn.dataset.slug));
+        });
+    }
+
+    function syncLocalToServer() {
+        const local = loadLocal();
+        if (!local.length) {
+            refreshAll();
+            return;
+        }
+
+        fetch(config.syncUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken(),
+            },
+            body: JSON.stringify({ slugs: local }),
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('sync failed');
+                }
+
+                return response.json();
+            })
+            .then(function (data) {
+                slugs = new Set(data.slugs || []);
+                localStorage.removeItem(storageKey);
+                refreshAll();
+            })
+            .catch(function () {
+                refreshAll();
+            });
+    }
+
+    if (!config.authenticated) {
+        slugs = new Set(loadLocal());
+    }
+
+    refreshAll();
+
+    if (config.authenticated) {
+        syncLocalToServer();
+    }
+
+    document.addEventListener('click', function (event) {
+        const btn = event.target.closest('.action-favorite');
+        if (!btn) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const slug = btn.dataset.slug;
+        if (!slug) {
+            return;
+        }
+
+        if (config.authenticated) {
+            fetch(toggleUrl(slug), {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                },
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('toggle failed');
+                    }
+
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.favorited) {
+                        slugs.add(data.slug);
+                    } else {
+                        slugs.delete(data.slug);
+                        const card = btn.closest('.product-card');
+                        if (card && card.closest('.account-favorites-grid')) {
+                            card.remove();
+                        }
+                    }
+
+                    refreshAll();
+                })
+                .catch(function () {});
+
+            return;
+        }
+
+        if (slugs.has(slug)) {
+            slugs.delete(slug);
+        } else {
+            slugs.add(slug);
+        }
+
+        saveLocal(slugs);
+        refreshAll();
+    });
+}
+
+function initCiFileUploads() {
+    document.querySelectorAll('.ci-form .form-group input[type="file"]').forEach(function (input) {
+        if (input.closest('.ci-file-upload')) {
+            return;
+        }
+
+        const hint = input.dataset.uploadHint || ciFileAcceptHint(input.accept);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ci-file-upload';
+
+        const zone = document.createElement('div');
+        zone.className = 'ci-file-upload__zone';
+        zone.innerHTML =
+            '<i class="fa-solid fa-cloud-arrow-up ci-file-upload__icon" aria-hidden="true"></i>' +
+            '<img class="ci-file-upload__preview" alt="" hidden>' +
+            '<p class="ci-file-upload__prompt">Glisser-déposer ou <strong>parcourir</strong></p>' +
+            '<p class="ci-file-upload__name"></p>' +
+            (hint ? '<p class="ci-file-upload__hint">' + hint + '</p>' : '');
+
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(zone);
+        wrapper.appendChild(input);
+
+        const nameEl = zone.querySelector('.ci-file-upload__name');
+        const previewEl = zone.querySelector('.ci-file-upload__preview');
+
+        function syncFileState() {
+            const file = input.files && input.files[0];
+
+            if (!file) {
+                wrapper.classList.remove('has-file', 'is-image');
+                nameEl.textContent = '';
+                previewEl.hidden = true;
+                previewEl.removeAttribute('src');
+                return;
+            }
+
+            wrapper.classList.add('has-file');
+            nameEl.textContent = file.name;
+
+            if (file.type.startsWith('image/')) {
+                wrapper.classList.add('is-image');
+                previewEl.src = URL.createObjectURL(file);
+                previewEl.hidden = false;
+            } else {
+                wrapper.classList.remove('is-image');
+                previewEl.hidden = true;
+                previewEl.removeAttribute('src');
+            }
+        }
+
+        input.addEventListener('change', syncFileState);
+
+        ['dragenter', 'dragover'].forEach(function (eventName) {
+            wrapper.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                wrapper.classList.add('is-dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(function (eventName) {
+            wrapper.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                wrapper.classList.remove('is-dragover');
+            });
+        });
+
+        wrapper.addEventListener('drop', function (event) {
+            const files = event.dataTransfer && event.dataTransfer.files;
+            if (!files || !files.length) {
+                return;
+            }
+
+            const transfer = new DataTransfer();
+            transfer.items.add(files[0]);
+            input.files = transfer.files;
+            syncFileState();
+        });
+    });
+}
+
+function ciFileAcceptHint(accept) {
+    if (!accept) {
+        return 'Tous types de fichiers';
+    }
+
+    if (accept.includes('image')) {
+        return 'PNG, JPG, WebP, GIF…';
+    }
+
+    if (accept.includes('video') || accept.includes('audio')) {
+        return 'Vidéo ou audio';
+    }
+
+    return accept.replace(/\*/g, '').replace(/,/g, ', ').trim();
+}
+
+function initCatalogSearchFocus() {
+    if (window.location.hash !== '#catalog-search') {
+        return;
+    }
+
+    var input = document.getElementById('catalog-search');
+    if (!input) {
+        return;
+    }
+
+    window.setTimeout(function () {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+}

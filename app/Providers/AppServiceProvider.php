@@ -8,6 +8,8 @@ use App\Models\SiteSetting;
 use App\Models\SiteStat;
 use App\Models\Taxonomy;
 use App\Services\CartService;
+use App\Services\CurrencyService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -42,6 +44,23 @@ class AppServiceProvider extends ServiceProvider
             } catch (\Throwable) {
                 $view->with('navCategories', config('collectinfos.categories', []));
             }
+
+            $favoriteSlugs = [];
+            if (Auth::check()) {
+                try {
+                    if (Schema::hasTable('content_favorites')) {
+                        $favoriteSlugs = Auth::user()
+                            ->favoriteContents()
+                            ->pluck('slug')
+                            ->all();
+                    }
+                } catch (\Throwable) {
+                    $favoriteSlugs = [];
+                }
+            }
+
+            $view->with('userFavoriteSlugs', $favoriteSlugs);
+            $view->with('currency', app(CurrencyService::class));
         });
     }
 }

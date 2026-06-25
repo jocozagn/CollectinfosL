@@ -12,6 +12,12 @@ class ContentPurchase extends Model
         'content_id',
         'price',
         'purchased_at',
+        'payment_method',
+        'payment_status',
+        'payment_reference',
+        'invoice_number',
+        'platform_fee',
+        'journalist_earning',
     ];
 
     protected function casts(): array
@@ -19,6 +25,8 @@ class ContentPurchase extends Model
         return [
             'price' => 'decimal:2',
             'purchased_at' => 'datetime',
+            'platform_fee' => 'decimal:2',
+            'journalist_earning' => 'decimal:2',
         ];
     }
 

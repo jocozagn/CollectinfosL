@@ -67,6 +67,30 @@
 
                 </a>
 
+                <a href="{{ route('admin.submissions.index') }}" @class(['active' => request()->routeIs('admin.submissions.*')])>
+
+                    <i class="fa-solid fa-inbox" aria-hidden="true"></i> Soumissions
+
+                </a>
+
+                <a href="{{ route('admin.orders.index') }}" @class(['active' => request()->routeIs('admin.orders.*')])>
+
+                    <i class="fa-solid fa-box" aria-hidden="true"></i> Commandes
+
+                </a>
+
+                <a href="{{ route('admin.journalist-profiles.index') }}" @class(['active' => request()->routeIs('admin.journalist-profiles.*')])>
+
+                    <i class="fa-solid fa-user-check" aria-hidden="true"></i> Profils journalistes
+
+                </a>
+
+                <a href="{{ route('admin.wallet-payouts.index') }}" @class(['active' => request()->routeIs('admin.wallet-payouts.*')])>
+
+                    <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i> Reversements
+
+                </a>
+
                 <span class="admin-nav-label">Référentiels</span>
 
                 <a href="{{ route('admin.taxonomies.index', 'categories') }}" @class(['active' => request()->routeIs('admin.taxonomies.*') && request()->route('kind') === 'categories'])>
